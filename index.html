@@ -9,11 +9,20 @@
 <body>    
     <div class="inputLetters">
         <input type="text" id="inputLetters" name="Letters"> </input>
+        <div class="dropdown">
+            <button onclick="dropDownFunction(this)" class="dropbtn">Langue</button>
+            <div id="myDropdown" class="dropdown-content">
+                <button class="dropbtnchoice" onclick="changeLanguage('French')">Français</a>
+                <button class="dropbtnchoice" onclick="changeLanguage('English')">English</a>
+            </div>
+        </div>
     </div>
     <div class="outputWords">
         <p id="outputWords"></p>
     </div>
-    <script src="dico.js"></script>
+    
+    <script src="englishDictionary.js"></script>
+    <script src="frenchDictionary.js"></script>
     <script src="Dawg.js"></script>
     <script src="WordSearch.js"></script>
 </body>
