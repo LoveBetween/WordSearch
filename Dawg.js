@@ -132,10 +132,10 @@ class Dawg {
 		}
 		for (const [label, child] of node.edges.entries()) {
 			for (let i = 0; i < letters.length; i++) {
-				if (label == letters[i]) {
+				if (label == letters[i] || letters[i] == "*") {
 					let newLetters = letters.slice();
 					newLetters.splice(i, 1);
-					dawg.findWordsRec(child, newLetters, word.concat(letters[i]), words);
+					dawg.findWordsRec(child, newLetters, word.concat(label), words);
 				}
 			}
 		}

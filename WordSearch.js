@@ -51,8 +51,12 @@ var alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 function onInputLetter(e){
     let letters = e.target.value
-    if (/[^a-zA-Z]/.test(letters)){
-        OutputText.innerText = "Votre entrée ne doit contenir que des lettres!"
+    if (/[^a-zA-Z*]/.test(letters)){
+        OutputText.innerText = "Votre entrée ne doit contenir que des lettres ou des *!"
+        return
+    }
+    if ((letters.split("*").length - 1) > 4){
+        OutputText.innerText = "Votre entrée ne doit pas contenir plus de 4 *!"
         return
     }
     let array = letters.toUpperCase().split("")
