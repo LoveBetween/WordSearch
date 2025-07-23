@@ -2,28 +2,82 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="style.css">
-    <title>Word Game</title>
+    <meta charset="UTF-8" />
+    <title>Word Games</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+        .page {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+
+        .top-buttons {
+            margin: 10px;
+        }
+    </style>
 </head>
 
-<body>    
-    <div class="inputLetters">
-        <input type="text" id="inputLetters" name="Letters"> </input>
-        <div class="dropdown">
-            <button onclick="dropDownFunction(this)" class="dropbtn">Langue</button>
-            <div id="myDropdown" class="dropdown-content">
-                <button class="dropbtnchoice" onclick="changeLanguage('French')">Français</a>
-                <button class="dropbtnchoice" onclick="changeLanguage('English')">English</a>
+<body onload="initScrubble()"> <!-- initScrubble defined below -->
+    <div class="top-buttons">
+        <button onclick="showPage('page1')">Letter Search</button>
+        <button onclick="showPage('page2')">Scrubble</button>
+    </div>
+
+    <!-- PAGE 1: Letter Input + Language -->
+    <div id="page1" class="page active">
+        <div class="inputLetters">
+            <input type="text" id="inputLetters" name="Letters">
+            <div class="dropdown">
+                <button onclick="dropDownFunction(this)" class="dropbtn">Langue</button>
+                <div id="myDropdown" class="dropdown-content">
+                    <button class="dropbtnchoice" onclick="changeLanguage('French')">Français</button>
+                    <button class="dropbtnchoice" onclick="changeLanguage('English')">English</button>
+                </div>
             </div>
         </div>
+        <div class="outputWords">
+            <p id="outputWords"></p>
+        </div>
     </div>
-    <div class="outputWords">
-        <p id="outputWords"></p>
+
+    <!-- PAGE 2: Scrubble -->
+    <div id="page2" class="page">
+        <canvas id="viewport" width="800" height="800"></canvas>
     </div>
-    
+
+    <!-- Shared Scripts -->
     <script src="englishDictionary.js"></script>
     <script src="frenchDictionary.js"></script>
     <script src="Dawg.js"></script>
+
+    <!-- Page 1 specific -->
     <script src="WordSearch.js"></script>
+
+    <!-- Page 2 specific -->
+    <script src="ScrubbleWordLib.js"></script>
+    <script src="ScrubbleDisplayLib.js"></script>
+    <script src="Scrubble.js"></script>
+    <script>
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function dropDownFunction(btn) {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+        // Only init Scrubble if canvas page is shown
+        function initScrubble() {
+            // Wait a moment before calling init() so the canvas exists
+            setTimeout(() => {
+                if (typeof init === 'function') init();
+            }, 100);
+        }
+    </script>
 </body>
 </html>

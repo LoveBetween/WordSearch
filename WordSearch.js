@@ -18,7 +18,7 @@ window.onclick = function(event) {
                 openDropdown.classList.remove('show');
         }
     }
-} 
+}
 
 //https://stackoverflow.com/questions/724857/how-to-find-javascript-variable-by-its-name use this or arrays
 
