@@ -50,6 +50,10 @@ function findPlacementVertical(grid, x, y, dir){
     if (!correctPlacement){
         return null
     }
+    placement.nextLetter = "_"
+    if(y+spaceNb+letterNb+1<15){
+        placement.nextLetter = grid[x][y+spaceNb+letterNb+1]
+    }
     placement.word = mainWord
     placement.perpendicular = perpendicularWords
     return placement
@@ -93,7 +97,8 @@ Dawg.prototype.checkValidWord = function(word){
 
 Dawg.prototype.checkPlacementRec = function(placement, node, letters, newWord, words, isConnected, letterPlaced){
     if( node.final && isConnected && letterPlaced &&
-        (placement.word.length<=newWord.length || placement.word[newWord.length] == "_")){ // the word shouldn't end with a letter right after it
+        (placement.word.length<=newWord.length && placement.nextLetter == "_" 
+            || placement.word[newWord.length] == "_")){ // the word shouldn't end with a letter right after it
         words.add(newWord)
     }
     if(newWord.length == placement.word.length){
@@ -153,4 +158,44 @@ function removeLetters(letters, word){
         letters = letters.replace(letter, "")
     }
     return letters
+}
+
+function placeWord(grid,placement, word){
+    let placed = false
+    if (placement.direction == "horizontal"){
+        if(placement.x+word.length<16){
+            for(let i=0; i< word.length; i++){
+                grid[placement.x+i][placement.y] = word[i]
+            }
+            placed = true
+        }
+    } 
+    if (placement.direction == "vertical"){
+        if(placement.y+word.length<16){
+            for(let i=0; i< word.length; i++){
+                grid[placement.x][placement.y+i] = word[i]
+            }
+            placed = true
+        }
+    } 
+    return placed
+}
+
+// filtering
+
+function getLongestWordPlacement(placements){
+    return placements.map(
+        ([placement, words]) => {
+            let word = words.reduce(
+                function(a, b){
+                    return a.length > b.length ? a : b;
+                }
+            )
+            return {placement,word}
+        }
+    ).reduce(
+        function(a, b){
+            return a.word.length > b.word.length ? a : b;
+        }
+    )
 }
