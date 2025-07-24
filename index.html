@@ -9,12 +9,22 @@
 
 <body onload="initScrubble()"> <!-- initScrubble defined below -->
     <div class="top-buttons">
-        <button onclick="showPage('page1')">Letter Search</button>
-        <button onclick="showPage('page2')">Scrubble</button>
+        <button onclick="showPage('page1')">Scrubble</button>
+        <button onclick="showPage('page2')">Word Search</button>
     </div>
 
-    <!-- PAGE 1: Letter Input + Language -->
+    <!-- PAGE 1: Scrubble -->
     <div id="page1" class="page active">
+        <div class="Scrubble">
+            <canvas id="viewport" width="800" height="800"></canvas>
+        </div>
+         <div class="Scrubble">
+            <p id="playedWords"></p>
+        </div>
+    </div>
+
+    <!-- PAGE 2: Word search -->
+    <div id="page2" class="page">
         <div class="inputLetters">
             <input type="text" id="inputLetters" name="Letters">
             <div class="dropdown">
@@ -30,28 +40,15 @@
         </div>
     </div>
 
-    <!-- PAGE 2: Scrubble -->
-    <div id="page2" class="page">
-        <div class="Scrubble">
-            <canvas id="viewport" width="800" height="800"></canvas>
-        </div>
-         <div class="Scrubble">
-            <p id="playedWords"></p>
-        </div>
-    </div>
-
     <!-- Shared Scripts -->
-    <script src="englishDictionary.js"></script>
-    <script src="frenchDictionary.js"></script>
-    <script src="Dawg.js"></script>
+    <script src="Lib/englishDictionary.js"></script>
+    <script src="Lib/frenchDictionary.js"></script>
+    <script src="Lib/Dawg.js"></script>
 
     <!-- Page 1 specific -->
-    <script src="WordSearch.js"></script>
-
-    <!-- Page 2 specific -->
-    <script src="ScrubbleWordLib.js"></script>
-    <script src="ScrubbleDisplayLib.js"></script>
-    <script src="Scrubble.js"></script>
+    <script src="Scrubble/ScrubbleWordLib.js"></script>
+    <script src="Scrubble/ScrubbleDisplayLib.js"></script>
+    <script src="Scrubble/Scrubble.js"></script>
     <script>
         function showPage(pageId) {
             const pages = document.querySelectorAll('.page');
@@ -71,5 +68,8 @@
             }, 100);
         }
     </script>
+
+    <!-- Page 2 specific -->
+    <script src="WordSearch/WordSearch.js"></script>
 </body>
 </html>

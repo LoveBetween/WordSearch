@@ -79,7 +79,6 @@ function findAllPlacements(grid){
     return allPlacements
 }
 
-
 // Adding new function to dawg class
 Dawg.prototype.checkValidWord = function(word){
     let node = this.root;
@@ -160,7 +159,7 @@ function removeLetters(letters, word){
     return letters
 }
 
-function placeWord(grid,placement, word){
+function placeWord(grid, placement, word){
     let placed = false
     if (placement.direction == "horizontal"){
         if(placement.x+word.length<16){
@@ -182,6 +181,15 @@ function placeWord(grid,placement, word){
 }
 
 // filtering
+function getAllCorrectPlacements(placements, letters){
+    return placements
+    .map(
+        placement => [placement, Array.from(dawg.checkPlacement(placement, letters))]
+    )
+    .filter(
+        ([_, words]) => words.length > 0
+    )
+}
 
 function getLongestWordPlacement(placements){
     return placements.map(

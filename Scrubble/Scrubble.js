@@ -1,9 +1,27 @@
-function initGrid(width, height){
-    return Array(width).fill(null).map(() => Array(height).fill("_"))
+class Game{
+    constructor(width, height, cellSize, p1Type, p2Type){
+        this.width = 15
+        this.height = 15
+        this.grid = this.initGrid(15, 15) //15,15 for now
+        this.turn = 1
+        this.p1 = {type:p1Type, letters:"", score:0}
+        this.p2 = {type:p2Type, letters:"", score:0}
+        this.cellSize = cellSize
+    }
+    initGrid(width, height){
+        return Array(width).fill(null).map(() => Array(height).fill("_"))
+    }
+    getInput(posX, posY){
+        let x = Math.floor(posX/this.cellSize)
+        let y = Math.floor(posY/this.cellSize)
+        if(x < this.width && y < this.height){
+            let cell = [x,y]
+        }
+    }
 }
 
-function createFrenchSpanLink(word){
-    return "<a target=\"_blank\" href=https://www.cnrtl.fr/definition/" + word + ">" +word+"</a>"
+function initGrid(width, height){
+    return Array(width).fill(null).map(() => Array(height).fill("_"))
 }
 
 function init(){
@@ -18,11 +36,7 @@ function init(){
         const allPossiblePlacements = findAllPlacements(grid);
         //console.log("Total placements:", allPossiblePlacements.length);
 
-        const allCorrectPlacements = allPossiblePlacements
-            .map(placement => [placement, Array.from(dawg.checkPlacement(placement, letters))])
-            .filter(([_, words]) => words.length > 0);
-
-        //console.log("Valid placements with words:", allCorrectPlacements);
+        const allCorrectPlacements = getAllCorrectPlacements(allPossiblePlacements, letters)
         //console.log("Count of valid placements:", allCorrectPlacements.length);
 
         if (allCorrectPlacements.length === 0) {
