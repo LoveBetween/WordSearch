@@ -55,62 +55,8 @@ function findPlacementVertical(grid, x, y, dir){
     return placement
 }
 
-// function findPlacementHorizontalPerpendicular(grid, x, y){
-//     let placement = "_"
-//     for(let before=1; y-before>0 && (grid[x][y-before] != "_");before++){
-//         placement = grid[x][y-before].concat(placement)
-//     }
-//     for(let after=1; y+after<15 && (grid[x][y+after] != "_");after++){
-//         placement = placement.concat(grid[x][y+after])
-//     }
-//     return placement
-// }
-
-// function findPlacementHorizontal(grid, x, y) {
-//     if(x>0 && grid[x-1][y] != "_"){
-//         return null
-//     }
-//     let correctPlacement = false;
-//     let letterNb = 0;
-//     let spaceNb = 0;
-//     let placement = {};
-//     placement.x = x
-//     placement.y = y
-//     placement.direction = "horizontal"
-//     let mainWord = "";
-//     let perpendicularWords = [];
-    
-//     while (spaceNb < 7 && x + spaceNb + letterNb < 15) {
-//         if (grid[x + spaceNb + letterNb][y] == "_") {
-//             mainWord = mainWord.concat("_");
-//             let perpendicularPlacement = findPlacementHorizontalPerpendicular(grid, x + spaceNb + letterNb, y);
-//             perpendicularWords.push(perpendicularPlacement);
-//             if (perpendicularPlacement.length > 1) {
-//                 correctPlacement = true;
-//             }
-//             spaceNb++;
-//         } else {
-//             mainWord = mainWord.concat(grid[x + spaceNb + letterNb][y]);
-//             perpendicularWords.push("")
-//             letterNb++;
-//             correctPlacement = true;
-//         }
-//     }
-
-//     placement.word = mainWord;
-//     placement.perpendicular = perpendicularWords;
-
-//     if (!correctPlacement) {
-//         return null;
-//     }
-
-//     return placement;
-// }
-
-// first version naive
 function findAllPlacements(grid){
     let transposedGrid = grid[0].map((_, colIndex) => grid.map(row => row[colIndex]));
-    // console.log(grid)
     let allPlacements = []
     for(let x=0;x<15;x++){
         for(let y=0;y<15;y++){

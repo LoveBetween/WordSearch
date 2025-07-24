@@ -5,7 +5,7 @@ function initGrid(width, height){
 function placeWord(grid, x, y, direction, word){
     let placed = false
     if (direction == "horizontal"){
-        if(x+word.length<15){
+        if(x+word.length<16){
             for(let i=0; i< word.length; i++){
                 grid[x+i][y] = word[i]
             }
@@ -13,7 +13,7 @@ function placeWord(grid, x, y, direction, word){
         }
     } 
     if (direction == "vertical"){
-        if(y+word.length<15){
+        if(y+word.length<16){
             for(let i=0; i< word.length; i++){
                 grid[x][y+i] = word[i]
             }
@@ -21,6 +21,10 @@ function placeWord(grid, x, y, direction, word){
         }
     } 
     return placed
+}
+
+function createFrenchSpanLink(word){
+    return "<a target=\"_blank\" href=https://www.larousse.fr/dictionnaires/francais/" + word + ">" +word+"</a>"
 }
 
 function init(){
@@ -47,13 +51,32 @@ function init(){
             return false;
         }
 
-        const [placement, validWords] = allCorrectPlacements[Math.floor(Math.random() * allCorrectPlacements.length)];
-        const chosenWord = validWords[Math.floor(Math.random() * validWords.length)];
+        //const [placement, validWords] = allCorrectPlacements[Math.floor(Math.random() * allCorrectPlacements.length)];
+        //const chosenWord = validWords[Math.floor(Math.random() * validWords.length)];
 
-        console.log("Chosen placement and word:", placement, chosenWord);
+        const longestPlacement = allCorrectPlacements.map(
+            ([placement, words]) => {
+                let word = words.reduce(
+                    function(a, b){
+                        return a.length > b.length ? a : b;
+                    }
+                )
+                return {placement,word}
+            }
+        ).reduce(
+            function(a, b){
+                return a.word.length > b.word.length ? a : b;
+            }
+        )
+        const placement = longestPlacement.placement
+        const chosenWord = longestPlacement.word
+        console.log("Chosen ", placement, chosenWord);
 
         placeWord(grid, placement.x, placement.y, placement.direction, chosenWord)
         var canvas = document.getElementById("viewport");
+        var playedWords = document.getElementById("playedWords");
+        playedWords.setAttribute('style', 'white-space: pre');
+        playedWords.innerHTML = playedWords.innerHTML + chosenWord.length + " - " + createFrenchSpanLink(chosenWord) + "\n"
         displayGrid(grid, canvas, 20)
         return true
     }
@@ -62,27 +85,9 @@ function init(){
 
     const startTime2 = performance.now()
     
-    for(let i=0; i< 200;i++){
+    for(let i=0; i< 30;i++){
         findAllValidWords(grid, letterBag)
     }
-    
-
-    // var testPlacement = {}
-    // testPlacement.x = 5
-    // testPlacement.y = 3
-    // testPlacement.direction = "vertical"
-    // testPlacement.word = "_______"
-    // testPlacement.perpendicular = ["_", "_", "_", "_", "_", "EUE_", "H_"]
-    // console.log(dawg.checkPlacement(testPlacement, "SORTIES"))
-    // var canvas = document.getElementById("viewport");
-    // displayGrid(grid, canvas, 20)
-
-
     const endTime2 = performance.now()
-    console.log(`found all the possible words in ${(endTime2 - startTime2)/1000} milliseconds`)
-
-    //display
-
-    
-    
+    console.log(`found all the possible words in ${(endTime2 - startTime2)/1000} milliseconds`) 
 }

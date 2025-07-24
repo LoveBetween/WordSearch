@@ -86,3 +86,20 @@ Dropdown Button
 
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {display:block;} 
+
+.page {
+    display: none;
+}
+.active {
+    display: block;
+}
+
+.top-buttons {
+    margin: 10px;
+}
+
+.Scrubble{
+    margin: 1%;
+    width: 48%;
+    float:left;
+}
