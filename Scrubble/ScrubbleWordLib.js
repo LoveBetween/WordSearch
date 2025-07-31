@@ -135,8 +135,19 @@ Dawg.prototype.checkPlacement = function(placement, letters){
     return(this.checkPlacementRec(placement, this.root, letters, "", words, false, false))
 }
 
-var alphabet = "ABCDEFGHIJKLMNOPQRSTVUWXYZ"//*"
+var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"//*"
 var nbLettres = [9,2,2,3,15,2,2,2,8,1,1,5,3,6,6,2,1,6,6,6,6,2,1,1,1,1]//,2]
+var valeurDesLettres = [1,3,3,2,1,4,2,4,1,8,10,1,2,1,1,3,8,1,1,1,1,4,10,10,10,10]//, 0]
+
+let nbObj = {};
+let valeurObj = {};
+
+for (let i = 0; i < alphabet.length; i++) {
+    let letter = alphabet[i];
+    nbObj[letter] = nbLettres[i];
+    valeurObj[letter] = valeurDesLettres[i];
+}
+
 var sacDeLettres = ""
 for (let i=0;i<alphabet.length;i++){
     sacDeLettres+=alphabet[i].repeat(nbLettres[i])
@@ -206,4 +217,47 @@ function getLongestWordPlacement(placements){
             return a.word.length > b.word.length ? a : b;
         }
     )
+}
+
+function calculatePlacementScore(placement, word, letterPoints, multiGrid){
+    let x = placement.x
+    let y = placement.y
+
+    let score = 0
+    let usedLetters = 0
+
+    // calculating main word points:
+
+    let multiplier = 1
+    let mainScore = 0
+    let cellType = 0
+    for(let i = 0; i < word.length; i++){
+        if(placement.direction == "horizontal"){
+            cellType = multiGrid[x+i][y]
+        }
+        else{
+            cellType = multiGrid[x][y+i]
+        }
+        if(cellType < 3){
+            mainScore += letterPoints[word[i]]*(cellType+1)
+        }
+        else if (cellType < 5){
+            mainScore += letterPoints[word[i]]
+            if(placement.word[i] == "_"){
+                multiplier = Math.max(multiplier, cellType-1)
+            }
+        }
+    }
+    mainScore = mainScore * multiplier
+    console.log("mainscore" + mainScore)
+
+
+    // Calculating perpendicular word points :
+
+    // for (var i =0; i< placement.perpendicular.length; i++){
+    //     console.log(placement.perpendicular[i])
+    // }
+
+    return mainScore
+    
 }
