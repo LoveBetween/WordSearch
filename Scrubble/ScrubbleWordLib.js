@@ -191,6 +191,63 @@ function placeWord(grid, placement, word){
     return placed
 }
 
+function calculatePlacementScore(placement, word, letterPoints, multiGrid){
+    let x = placement.x
+    let y = placement.y
+
+    let multiplier = 1
+    let totalScore = 0
+    let wordScore = 0
+    let cellType = 0
+
+    let lettersUsed = 0
+    for(let i = 0; i < word.length; i++){
+        // calculating main word points:
+        let currentMulti = 1
+        let currentLetterPoints = 0
+        if(placement.word[i] == "_"){
+            lettersUsed++
+        }
+        if(placement.direction == "horizontal"){
+            cellType = multiGrid[x+i][y]
+        }
+        else{
+            cellType = multiGrid[x][y+i]
+        }
+        if(cellType < 3){
+            currentLetterPoints = letterPoints[word[i]]*(cellType+1)
+        }
+        else if (cellType < 5){
+            currentLetterPoints = letterPoints[word[i]]
+            if(placement.word[i] == "_"){
+                currentMulti = cellType - 1
+                multiplier = Math.max(multiplier, cellType-1)
+            }
+        }
+        wordScore += currentLetterPoints
+
+        // calculate perpendicular word score, bonuses can only affect placed letter
+        let pp = placement.perpendicular[i]
+        let ppScore = 0
+        if (pp.length > 1){
+            let hole = pp.indexOf("_")
+            for(let j = 0;j<pp.length; j++){
+                if(j == hole){
+                    ppScore += currentLetterPoints
+                }
+                else{
+                    ppScore += letterPoints[pp[j]]
+                }
+            }
+            totalScore += ppScore * currentMulti
+        }
+        
+    }
+    totalScore = wordScore * multiplier
+    totalScore = lettersUsed >= 7 ? totalScore + 50: totalScore;
+    return totalScore
+}
+
 // filtering
 function getAllCorrectPlacements(placements, letters){
     return placements
@@ -202,62 +259,16 @@ function getAllCorrectPlacements(placements, letters){
     )
 }
 
-function getLongestWordPlacement(placements){
-    return placements.map(
-        ([placement, words]) => {
-            let word = words.reduce(
-                function(a, b){
-                    return a.length > b.length ? a : b;
-                }
-            )
-            return {placement,word}
-        }
-    ).reduce(
-        function(a, b){
-            return a.word.length > b.word.length ? a : b;
-        }
-    )
+const Filters = {
+    LONGEST: (a, b) => a.word.length > b.word.length ? a : b,
+    MOSTPOINTS : (a,b) => calculatePlacementScore(a.placement, a.word, valeurObj, standardMultiGrid) > 
+    calculatePlacementScore(b.placement, b.word, valeurObj, standardMultiGrid) ? a : b,
+    SHORTEST: (a,b) => a.word.length < b.word.length ? a : b,
+
 }
 
-function calculatePlacementScore(placement, word, letterPoints, multiGrid){
-    let x = placement.x
-    let y = placement.y
-
-    let score = 0
-    let usedLetters = 0
-
-    // calculating main word points:
-
-    let multiplier = 1
-    let mainScore = 0
-    let cellType = 0
-    for(let i = 0; i < word.length; i++){
-        if(placement.direction == "horizontal"){
-            cellType = multiGrid[x+i][y]
-        }
-        else{
-            cellType = multiGrid[x][y+i]
-        }
-        if(cellType < 3){
-            mainScore += letterPoints[word[i]]*(cellType+1)
-        }
-        else if (cellType < 5){
-            mainScore += letterPoints[word[i]]
-            if(placement.word[i] == "_"){
-                multiplier = Math.max(multiplier, cellType-1)
-            }
-        }
-    }
-    mainScore = mainScore * multiplier
-    console.log("mainscore" + mainScore)
-
-
-    // Calculating perpendicular word points :
-
-    // for (var i =0; i< placement.perpendicular.length; i++){
-    //     console.log(placement.perpendicular[i])
-    // }
-
-    return mainScore
-    
+function filterWords(placements, filter){
+    return placements.flatMap(
+        ([placement, words]) => Array.from(words, (word) => ({placement, word}))
+    ).reduce(filter)
 }

@@ -29,7 +29,7 @@ class Game{
         this.highlightedCell = [x,y]
     }
     drawGrid(){
-        displayGrid(this.grid, standardMultiGrid, standardColor, this.canvas, 30, this.highlightedCell, valeurObj, true)
+        displayGrid(this.grid, standardMultiGrid, standardColor, this.canvas, this.cellSize, this.highlightedCell, valeurObj, true)
     }
 }
 
@@ -51,7 +51,7 @@ function init(){
     var dawg = new Dawg()
     dawg.setup(FRENCH_DICTIONNARY)
 
-    var game = new Game(15, 15, 30, "player", "computer", grid, canvas);
+    var game = new Game(15, 15, 40, "player", "computer", grid, canvas);
 
     document.getElementById("scrabbleBoard").addEventListener('click', function(e) { 
         inputHandler(document.getElementById("scrabbleBoard"), e, game)});
@@ -72,13 +72,14 @@ function init(){
         //const [placement, validWords] = allCorrectPlacements[Math.floor(Math.random() * allCorrectPlacements.length)];
         //const chosenWord = validWords[Math.floor(Math.random() * validWords.length)];
 
-        const longestPlacement = getLongestWordPlacement(allCorrectPlacements)
+        const longestPlacement = filterWords(allCorrectPlacements, Filters.MOSTPOINTS)
         const placement = longestPlacement.placement
         const chosenWord = longestPlacement.word
-        console.log("Chosen ", placement, chosenWord);
+        const score = calculatePlacementScore(placement, chosenWord, valeurObj, standardMultiGrid)
+        console.log("Chosen ", placement, chosenWord, score);
 
         placeWord(grid, placement, chosenWord)
-        calculatePlacementScore(placement, chosenWord, valeurObj, standardMultiGrid)
+        
         
         var playedWords = document.getElementById("playedWords");
         playedWords.setAttribute('style', 'white-space: pre');

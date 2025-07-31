@@ -39,7 +39,7 @@ function displayGrid(grid, multiGrid, multiColors, canvas, cellSize, highlighted
 }
 
 function createFrenchSpanLink(word){
-    return "<a target=\"_blank\" href=https://www.cnrtl.fr/definition/" + word + ">" +word+"</a>"
+    return "<a target=\"_blank\" href=https://www.exionnaire.com/" + word.toLowerCase() + ".html\">" +word+"</a>"
 }
 
 const standardMultiGrid = [

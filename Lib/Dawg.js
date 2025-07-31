@@ -1,4 +1,4 @@
-// Original code by Steve Hanov in python
+// Original code by Steve Hanov in Python
 // Link to the article http://stevehanov.ca/blog/index.php?id=115 
 class DawgNode {
 	NextId = 0;
@@ -123,7 +123,7 @@ class Dawg {
 
 	findWords(letters) {
 		let words = new Set();
-		return dawg.findWordsRec(this.root, letters, "", words);
+		return this.findWordsRec(this.root, letters, "", words);
 	}
 
 	findWordsRec(node, letters, word, words) {
@@ -135,7 +135,7 @@ class Dawg {
 				if (label == letters[i] || letters[i] == "*") {
 					let newLetters = letters.slice();
 					newLetters.splice(i, 1);
-					dawg.findWordsRec(child, newLetters, word.concat(label), words);
+					this.findWordsRec(child, newLetters, word.concat(label), words);
 				}
 			}
 		}
