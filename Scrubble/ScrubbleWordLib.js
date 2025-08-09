@@ -205,9 +205,6 @@ function calculatePlacementScore(placement, word, letterPoints, multiGrid){
         // calculating main word points:
         let currentMulti = 1
         let currentLetterPoints = 0
-        if(placement.word[i] == "_"){
-            lettersUsed++
-        }
         if(placement.direction == "horizontal"){
             cellType = multiGrid[x+i][y]
         }
@@ -215,7 +212,13 @@ function calculatePlacementScore(placement, word, letterPoints, multiGrid){
             cellType = multiGrid[x][y+i]
         }
         if(cellType < 3){
-            currentLetterPoints = letterPoints[word[i]]*(cellType+1)
+            if(placement.word[i] == "_"){
+                lettersUsed++
+                currentLetterPoints = letterPoints[word[i]]*(cellType+1)
+            }
+            else{
+                currentLetterPoints = letterPoints[word[i]]
+            }
         }
         else if (cellType < 5){
             currentLetterPoints = letterPoints[word[i]]

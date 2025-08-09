@@ -83,7 +83,7 @@ function init(){
         
         var playedWords = document.getElementById("playedWords");
         playedWords.setAttribute('style', 'white-space: pre');
-        playedWords.innerHTML = playedWords.innerHTML + chosenWord.length + " - " + createFrenchSpanLink(chosenWord) + "\n"
+        playedWords.innerHTML = playedWords.innerHTML + chosenWord.length + " - " + createFrenchSpanLink(chosenWord) +"  "+ score +" Points \n"
         displayGrid(grid, standardMultiGrid, standardColor, canvas, 40, null, valeurObj, true)
         return true
     }

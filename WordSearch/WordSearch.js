@@ -49,32 +49,37 @@ function changeLanguage(lang){
 var textWidthMax = 100
 var alphabet = "abcdefghijklmnopqrstuvwxyz";
 
+function createFrenchSpanLink(word){
+    return "<a target=\"_blank\" href=https://www.exionnaire.com/" + word.toLowerCase() + ".html\">" +word+" </a> "
+}
+
 function onInputLetter(e){
     let letters = e.target.value
     if (/[^a-zA-Z*]/.test(letters)){
-        OutputText.innerText = "Votre entrée ne doit contenir que des lettres ou des *!"
+        OutputText.innerHMTL = "Votre entrée ne doit contenir que des lettres ou des *!"
         return
     }
     if ((letters.split("*").length - 1) > 4){
-        OutputText.innerText = "Votre entrée ne doit pas contenir plus de 4 *!"
+        OutputText.innerHMTL = "Votre entrée ne doit pas contenir plus de 4 *!"
         return
     }
     let array = letters.toUpperCase().split("")
     let words = dawg.findWords(array)
     let sortedWords = [...words].sort((a, b) => b.length - a.length)
 
-    OutputText.innerText = ""
+    OutputText.innerHTML = "<br>"
 
 
     let wordLength = 100000
     let outputString = sortedWords.length+" mots trouvés!\n"
+    outputString = ""
     for (const word of sortedWords){
         let length = word.length
         if (length < wordLength){
             wordLength = length
-            outputString += "\n\nMots de "+wordLength+" lettres\n\n"
+            outputString += "<br><br>&emsp;<span style=\"word-spacing: 0;\"> Mots de "+wordLength+" lettres</span><br><br>";
         }
-        outputString += word+ " \u00a0 "
+        outputString += createFrenchSpanLink(word) + " "
     }
-    OutputText.innerText = outputString
+    OutputText.innerHTML = outputString
 }
