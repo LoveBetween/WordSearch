@@ -77,7 +77,7 @@ function onInputLetter(e){
         let length = word.length
         if (length < wordLength){
             wordLength = length
-            outputString += "<br><br>&emsp;<span style=\"word-spacing: 0;\"> Mots de "+wordLength+" lettres</span><br><br>";
+            outputString += "<br><br>&emsp;<span> Mots de "+wordLength+" lettres</span><br><br>";
         }
         outputString += createFrenchSpanLink(word) + " "
     }
