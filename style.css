@@ -112,8 +112,28 @@ Dropdown Button
     margin: 10px;
 }
 
-.Scrubble{
+#page1 {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#page1.active{
+    display: flex;
+}
+
+/* Equal width for both blocks on large screens */
+.Scrubble {
+    flex: 1 1 100%;
     margin: 1%;
-    width: 48%;
-    float:left;
+    box-sizing: border-box;
+}
+
+/*Ensure canvas is responsive*/
+canvas#scrabbleBoard {
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
