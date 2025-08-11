@@ -60,6 +60,10 @@ function letterDragOverlay(ctx, cellSize, char, posX, posY, lettersValue, drawVa
     }
 }
 
+function drawScore(scoreDisplay, p1, p2){
+    scoreDisplay.innerText = `Player 1 : ${p1.score} - Player 2 : ${p2.score}`;
+}
+
 function drawLetterRack(canvas, cellSize, letters, lettersValue, drawValue){
     let ctx = canvas.getContext("2d")
     ctx.lineWidth = 1;
@@ -69,11 +73,13 @@ function drawLetterRack(canvas, cellSize, letters, lettersValue, drawValue){
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.strokeStyle = "black"
     letters.forEach((letter, index) => {
-        drawCell(ctx, index, 0, cellSize, letter, lettersValue, drawValue)
-        ctx.beginPath();
-        ctx.moveTo(index*cellSize, 0)
-        ctx.lineTo(index*cellSize, cellSize)
-        ctx.stroke()
+        if(letter != null){
+            drawCell(ctx, index, 0, cellSize, letter, lettersValue, drawValue)
+            ctx.beginPath();
+            ctx.moveTo(index*cellSize, 0)
+            ctx.lineTo(index*cellSize, cellSize)
+            ctx.stroke()
+        }
     });
 }
 
@@ -98,5 +104,3 @@ const standardMultiGrid = [
     [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
     [4,0,0,1,0,0,0,4,0,0,0,1,0,0,4],
 ]
-
-const standardColor = ["beige", "lightblue", "#639eff", "pink", "red", "green"]

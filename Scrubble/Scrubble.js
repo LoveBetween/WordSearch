@@ -1,31 +1,75 @@
+var mouseDown = 0;
+document.body.onmousedown = function() { 
+  ++mouseDown;
+}
+document.body.onmouseup = function() {
+  --mouseDown;
+}
+
+const UIElements = {
+    cellSize : 40,
+    canvas : document.getElementById("scrabbleBoard"),
+    letterRackCanvas : document.getElementById("letterRack"),
+    scoreDisplay : document.getElementById("Score"),
+    standardColor : ["beige", "lightblue", "#639eff", "pink", "red", "green"],
+    standarMultiGrid : [
+        [4,0,0,1,0,0,0,4,0,0,0,1,0,0,4],
+        [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
+        [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
+        [1,0,0,3,0,0,0,1,0,0,0,3,0,0,1],
+        [0,0,0,0,3,0,0,0,0,0,3,0,0,0,0],
+        [0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+        [0,0,1,0,0,0,1,0,1,0,0,0,1,0,0],
+        [4,0,0,1,0,0,0,5,0,0,0,1,0,0,4],
+        [0,0,1,0,0,0,1,0,1,0,0,0,1,0,0],
+        [0,2,0,0,0,2,0,0,0,2,0,0,0,2,0],
+        [0,0,0,0,3,0,0,0,0,0,3,0,0,0,0],
+        [1,0,0,3,0,0,0,1,0,0,0,3,0,0,1],
+        [0,0,3,0,0,0,1,0,1,0,0,0,3,0,0],
+        [0,3,0,0,0,2,0,0,0,2,0,0,0,3,0],
+        [4,0,0,1,0,0,0,4,0,0,0,1,0,0,4],
+    ],
+}
+
+var GameInfo = {
+    width : 15,
+    height : 15,
+    grid : initGrid(15, 15),
+    p1 : {name:"p1", type:"computer", letters:"", score:0},
+    p2 : {name:"p2", type:"computer", letters:"", score:0},
+    highlightCell : null,
+    letterBag : sacDeLettres,
+    turn : 0,
+
+}
+
 class Game{
-    constructor(width, height, cellSize, p1Type, p2Type, grid, canvas, letterRackCanvas, letterBag){
+    constructor(_gi, _ui){
         let that = this
-        document.getElementById("scrabbleBoard").addEventListener('click', function(e) { 
-            inputHandler(document.getElementById("scrabbleBoard"), e, that)
+        _ui.canvas.addEventListener('click', function(e) { 
+            inputHandler(_ui.canvas, e, that)
         });
-        this.width = 15
-        this.height = 15
-        this.grid = grid
-        if (grid == null){
-            this.grid = this.initGrid(15, 15) //15,15 for now
-        }
-        this.turn = 0
-        this.p1 = {name:"p1", type:p1Type, letters:"", score:0}
-        this.p2 = {name: "p2", type:p2Type, letters:"", score:0}
-        this.cellSize = cellSize
+        _ui.letterRackCanvas.addEventListener('click', function(e){
+           inputHandler(_ui.letterRackCanvas, e, that)
+        });
+
+        document.getElementById("page1").addEventListener("pointermove", (event) => { 
+            this.onPointerMove(event)
+         })
+        this._ui = _ui
+        this._gi = _gi
         this.highlightedCell = null
-        this.canvas = canvas
-        this.letterRackCanvas = letterRackCanvas
-        this.letterBag = letterBag
+        this.letterRack = null
+        this.letterHeld = null
+        this.draggedLetter = null
     }
     initGrid(width, height){
         return Array(width).fill(null).map(() => Array(height).fill("_"))
     }
     getInput(posX, posY){
-        let x = Math.floor(posX/this.cellSize)
-        let y = Math.floor(posY/this.cellSize)
-        if(x < this.width && y < this.height){
+        let x = Math.floor(posX/this._ui.cellSize)
+        let y = Math.floor(posY/this._ui.cellSize)
+        if(x < this._gi.width && y < this._gi.height){
             let cell = [x,y]
             this.highlightCell(x, y)
             this.drawGrid()
@@ -35,16 +79,16 @@ class Game{
         this.highlightedCell = [x,y]
     }
     drawGrid(){
-        displayGrid(this.grid, standardMultiGrid, standardColor, this.canvas, this.cellSize, this.highlightedCell, valeurObj, true)
-        drawLetterRack(this.letterRackCanvas, 60, ["T","E","S","T","I","N","G"], valeurObj, true)
+        displayGrid(this._gi.grid, this._ui.standarMultiGrid, this._ui.standardColor, this._ui.canvas, this._ui.cellSize, this.highlightedCell, valeurObj, true)
+        drawLetterRack(this._ui.letterRackCanvas, this._ui.cellSize, this.letterRack, valeurObj, true)
     }
     updateScore(player, score){
         player.score += score
-        // displayScore
+        drawScore(this._ui.scoreDisplay, this._gi.p1, this._gi.p2)
     }
     playBotTurn(player, filter){
         console.log(player)
-        const allCorrectPlacements = getAllCorrectPlacements(findAllPlacements(this.grid), player.letters)
+        const allCorrectPlacements = getAllCorrectPlacements(findAllPlacements(this._gi.grid), player.letters)
 
         if (allCorrectPlacements.length === 0) {
             console.log("No valid words found for current grid and letters.");
@@ -54,7 +98,7 @@ class Game{
         const bestPlacement = filterWords(allCorrectPlacements, filter)
         const placement = bestPlacement.placement
         const chosenWord = bestPlacement.word
-        const score = calculatePlacementScore(placement, chosenWord, valeurObj, standardMultiGrid)
+        const score = calculatePlacementScore(placement, chosenWord, valeurObj, this._ui.standarMultiGrid)
         console.log("Chosen ", placement, chosenWord, score);
 
         this.placeWord(placement, chosenWord)
@@ -67,13 +111,13 @@ class Game{
         return true
     }
     drawLetters(player){
-        if (this.letterBag.length == 0){
+        if (this._gi.letterBag.length == 0){
             return false
         }
-        for(let i = player.letters.length; i< 7 && this.letterBag.length > 0; i++){
-            let rnd = Math.floor(Math.random() * this.letterBag.length)
-            player.letters += this.letterBag[rnd]
-            this.letterBag = this.letterBag.slice(0, rnd) + this.letterBag.slice(rnd + 1)
+        for(let i = player.letters.length; i< 7 && this._gi.letterBag.length > 0; i++){
+            let rnd = Math.floor(Math.random() * this._gi.letterBag.length)
+            player.letters += this._gi.letterBag[rnd]
+            this._gi.letterBag = this._gi.letterBag.slice(0, rnd) + this._gi.letterBag.slice(rnd + 1)
         }
         return true
     }
@@ -86,8 +130,9 @@ class Game{
     }
 
     newTurn(){
-        this.turn++
-        let player = this.turn%2==1? this.p1 : this.p2;
+        this._gi.turn++
+        let player = this._gi.turn%2==1? this._gi.p1 : this._gi.p2;
+        console.log(player)
         let isStuck = false
         if (player.type == "computer"){
             if(!this.playBotTurn(player, Filters.MOSTPOINTS)){
@@ -101,8 +146,8 @@ class Game{
             this.newTurn()
         }
         else{
-            console.log("Game Ended : player 1 has " + this.p1.score +
-                 " points and player 2 has " + this.p2.score + " points.")
+            console.log("Game Ended : player 1 has " + this._gi.p1.score +
+                 " points and player 2 has " + this._gi.p2.score + " points.")
         }
     
     }
@@ -112,7 +157,7 @@ class Game{
         if (placement.direction == "horizontal"){
             if(placement.x+word.length<16){
                 for(let i=0; i< word.length; i++){
-                    this.grid[placement.x+i][placement.y] = word[i]
+                    this._gi.grid[placement.x+i][placement.y] = word[i]
                 }
                 placed = true
             }
@@ -120,12 +165,30 @@ class Game{
         if (placement.direction == "vertical"){
             if(placement.y+word.length<16){
                 for(let i=0; i< word.length; i++){
-                    this.grid[placement.x][placement.y+i] = word[i]
+                    this._gi.grid[placement.x][placement.y+i] = word[i]
                 }
                 placed = true
             }
         } 
         return placed
+    }
+    clickLetterRack(posX){
+        let x = Math.floor(posX/40)
+        this.letterHeld = this.letterRack[x]
+        this.letterRack[x] = null
+        drawLetterRack(this._ui.letterRackCanvas, this._ui.cellSize, this.letterRack, valeurObj, true)
+    }
+
+    onPointerMove(e){
+        
+        if (this.letterHeld != null && mouseDown){
+            console.log(e.pageX, e.pageY)
+            let el = document.getElementById("dragged")
+            el.style.position = 'absolute'
+            el.style.left = e.pageX+"px"
+            el.style.top = e.pageY+"px"
+            el.innerText = this.letterHeld
+        }
     }
 }
 
@@ -134,7 +197,12 @@ function inputHandler(canvas, e, controller){
     let rect = canvas.getBoundingClientRect();
     let x = e.clientX - rect.left;
     let y = e.clientY - rect.top;
-    controller.getInput(x * scale, y * scale);
+    if(canvas.id == "scrabbleBoard"){
+        controller.getInput(x * scale, y * scale);
+    }
+    if(canvas.id == "letterRack"){
+        controller.clickLetterRack(x)
+    }
 }
 
 function initGrid(width, height){
@@ -143,15 +211,14 @@ function initGrid(width, height){
 
 function init(){
     var grid = initGrid(15, 15)
-    var canvas = document.getElementById("scrabbleBoard");
-    var letterRackCanvas = document.getElementById("letterRack");
     var dawg = new Dawg()
     dawg.setup(FRENCH_DICTIONNARY)
 
-    var game = new Game(15, 15, 40, "computer", "computer", grid, canvas, letterRackCanvas, sacDeLettres);
-    
+    var game = new Game(GameInfo, UIElements);
+    game.letterRack = ["T","E","S","T","I","N","G"]
+
     game.placeWord({ x:5, y:5, direction:"vertical"}, "SALUT")
-    game.drawLetters(game.p1)
-    game.drawLetters(game.p2)
+    game.drawLetters(game._gi.p1)
+    game.drawLetters(game._gi.p2)
     game.newTurn()
 }
