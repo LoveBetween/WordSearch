@@ -1,5 +1,5 @@
 class Game{
-    constructor(width, height, cellSize, p1Type, p2Type, grid, canvas, letterBag){
+    constructor(width, height, cellSize, p1Type, p2Type, grid, canvas, letterRackCanvas, letterBag){
         let that = this
         document.getElementById("scrabbleBoard").addEventListener('click', function(e) { 
             inputHandler(document.getElementById("scrabbleBoard"), e, that)
@@ -16,6 +16,7 @@ class Game{
         this.cellSize = cellSize
         this.highlightedCell = null
         this.canvas = canvas
+        this.letterRackCanvas = letterRackCanvas
         this.letterBag = letterBag
     }
     initGrid(width, height){
@@ -35,29 +36,24 @@ class Game{
     }
     drawGrid(){
         displayGrid(this.grid, standardMultiGrid, standardColor, this.canvas, this.cellSize, this.highlightedCell, valeurObj, true)
+        drawLetterRack(this.letterRackCanvas, 60, ["T","E","S","T","I","N","G"], valeurObj, true)
     }
     updateScore(player, score){
         player.score += score
         // displayScore
     }
-    updatePlayedWords(chosenWord, score){
-        var playedWords = document.getElementById("playedWords");
-        playedWords.setAttribute('style', 'white-space: pre');
-        playedWords.innerHTML = playedWords.innerHTML + chosenWord.length + " - " + createFrenchSpanLink(chosenWord) +"  "+ score +" Points \n"
-    }
     playBotTurn(player, filter){
         console.log(player)
-        const allPlacements = findAllPlacements(this.grid)
-        const allCorrectPlacements = getAllCorrectPlacements(allPlacements, player.letters)
+        const allCorrectPlacements = getAllCorrectPlacements(findAllPlacements(this.grid), player.letters)
 
         if (allCorrectPlacements.length === 0) {
             console.log("No valid words found for current grid and letters.");
             return false;
         }
 
-        const longestPlacement = filterWords(allCorrectPlacements, filter)
-        const placement = longestPlacement.placement
-        const chosenWord = longestPlacement.word
+        const bestPlacement = filterWords(allCorrectPlacements, filter)
+        const placement = bestPlacement.placement
+        const chosenWord = bestPlacement.word
         const score = calculatePlacementScore(placement, chosenWord, valeurObj, standardMultiGrid)
         console.log("Chosen ", placement, chosenWord, score);
 
@@ -66,7 +62,7 @@ class Game{
         const usedLetters = [...chosenWord].filter((ch, i) => placement.word[i] === "_").join('');
         this.removeLetters(player, usedLetters)
         this.updateScore(player, score)
-        this.updatePlayedWords(chosenWord, score)
+        updatePlayedWordsDisplay(chosenWord, score)
         this.drawGrid()
         return true
     }
@@ -147,11 +143,12 @@ function initGrid(width, height){
 
 function init(){
     var grid = initGrid(15, 15)
-    var canvas = document.getElementById("scrabbleBoard");  
+    var canvas = document.getElementById("scrabbleBoard");
+    var letterRackCanvas = document.getElementById("letterRack");
     var dawg = new Dawg()
     dawg.setup(FRENCH_DICTIONNARY)
 
-    var game = new Game(15, 15, 40, "computer", "computer", grid, canvas, sacDeLettres);
+    var game = new Game(15, 15, 40, "computer", "computer", grid, canvas, letterRackCanvas, sacDeLettres);
     
     game.placeWord({ x:5, y:5, direction:"vertical"}, "SALUT")
     game.drawLetters(game.p1)

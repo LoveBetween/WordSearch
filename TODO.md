@@ -6,3 +6,4 @@
 * Menu/Reset
 * Add info struct to contain all misc game info
 * Game summary
+* Add color coding to word history
