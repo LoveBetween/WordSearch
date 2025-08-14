@@ -2,7 +2,17 @@ function drawCell(ctx, x, y, cellSize, char, lettersValue, drawValue){
     ctx.font = Math.floor(cellSize*0.75).toString()+"px Arial";
     ctx.fillStyle = "black"
     char = char == "_" ? "" : char;
-    ctx.fillText(char,(x+0.15)*cellSize,(y+0.70)*cellSize);
+    if (char.length < 2){
+        ctx.fillText(char,(x+0.15)*cellSize,(y+0.70)*cellSize);
+    }
+    else{
+        char = char[0]
+        ctx.fillText(char,(x+0.15)*cellSize,(y+0.70)*cellSize);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "purple"
+        ctx.strokeRect(x*cellSize, y*cellSize, cellSize, cellSize)
+        ctx.lineWidth = 1;
+    }
     if (drawValue && char.length > 0){
         ctx.font = Math.floor(cellSize*0.30).toString()+"px Arial"
         let points = lettersValue[char]
@@ -38,8 +48,7 @@ function displayGrid(grid, multiGrid, multiColors, canvas, cellSize, highlighted
     ctx.save()
 }
 
-function updatePlayedWordsDisplay(chosenWord, score){
-    var playedWords = document.getElementById("playedWords");
+function updatePlayedWordsDisplay(playedWords, chosenWord, score){
     playedWords.setAttribute('style', 'white-space: pre');
     playedWords.innerHTML = playedWords.innerHTML + chosenWord.length + " - " + createFrenchSpanLink(chosenWord) +"  "+ score +" Points \n"
 }
@@ -67,7 +76,7 @@ function drawScore(scoreDisplay, p1, p2){
 function drawLetterRack(canvas, cellSize, letters, lettersValue, drawValue){
     let ctx = canvas.getContext("2d")
     ctx.lineWidth = 1;
-    canvas.width = cellSize*7
+    canvas.width = cellSize*letters.length
     canvas.height = cellSize
     ctx.fillStyle = "beige";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -76,8 +85,8 @@ function drawLetterRack(canvas, cellSize, letters, lettersValue, drawValue){
         if(letter != null){
             drawCell(ctx, index, 0, cellSize, letter, lettersValue, drawValue)
             ctx.beginPath();
-            ctx.moveTo(index*cellSize, 0)
-            ctx.lineTo(index*cellSize, cellSize)
+            ctx.moveTo((index+1)*cellSize+1, 0)
+            ctx.lineTo((index+1)*cellSize+1, cellSize)
             ctx.stroke()
         }
     });

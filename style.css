@@ -137,3 +137,7 @@ canvas#scrabbleBoard {
     height: auto;
     display: block;
 }
+
+#dragged {
+    display: none
+}
