@@ -121,22 +121,23 @@ class Dawg {
 		}
 	}
 
-	findWords(letters) {
-		function findWordsRec(node, letters, word, words) {
-			if (node.final) {
-				words.add(word);
-			}
-			for (const [label, child] of node.edges.entries()) {
-				for (let i = 0; i < letters.length; i++) {
-					if (label == letters[i] || letters[i] == "*") {
-						let newLetters = letters.slice();
-						newLetters.splice(i, 1);
-						this.findWordsRec(child, newLetters, word.concat(label), words);
-					}
+	findWordsRec(node, letters, word, words) {
+		if (node.final) {
+			words.add(word);
+		}
+		for (const [label, child] of node.edges.entries()) {
+			for (let i = 0; i < letters.length; i++) {
+				if (label == letters[i] || letters[i] == "*") {
+					let newLetters = letters.slice();
+					newLetters.splice(i, 1);
+					this.findWordsRec(child, newLetters, word.concat(label), words);
 				}
 			}
-			return words
 		}
+		return words
+	}
+
+	findWords(letters) {
 		let words = new Set();
 		return this.findWordsRec(this.root, letters, "", words);
 	}

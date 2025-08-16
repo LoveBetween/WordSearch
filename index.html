@@ -15,20 +15,25 @@
 
     <!-- PAGE 1: Scrubble -->
     <div id="page1" class="page active">
-        <div class="Scrubble">
-            <p id="Score"></p>
+        <div class="leftScrubble">
+            <div class="Scrubble">
+                <p id="Score"></p>
+            </div>
+            <div class="Scrubble">
+                <canvas id="scrabbleBoard" width="800" height="800"></canvas>
+            </div>
+            <div class="Scrubble">
+                <canvas id="letterRack" width="350" height="50"></canvas>
+                <button id="confirmPlay"> Confirmer mot</button>
+            </div>
+            <canvas id="dragged"></canvas>
         </div>
-        <div class="Scrubble">
-            <canvas id="scrabbleBoard" width="800" height="800"></canvas>
+        <div class = "rightScrubbleyy">
+            <div class="Scrubble">
+                <p id="playedWords"></p>
+            </div>
         </div>
-        <div class="Scrubble">
-            <canvas id="letterRack" width="350" height="50"></canvas>
-            <button id="confirmPlay"> Confirmer mot</button>
-        </div>
-         <div class="Scrubble">
-            <p id="playedWords"></p>
-        </div>
-        <canvas id="dragged"></canvas>
+        
     </div>
 
     <!-- PAGE 2: Word search -->

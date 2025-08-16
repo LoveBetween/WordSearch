@@ -79,10 +79,12 @@ function findAllPlacements(grid){
     return allPlacements
 }
 
+function isPlaced(cell) {
+    return typeof cell === "string" && cell.length === 2 && cell[1] === "°";
+}
+
 function findPlay(grid, width, height) {
-    function isPlaced(cell) {
-        return typeof cell === "string" && cell.length === 2 && cell[1] === "°";
-    }
+    
     var placedL = []
     grid.forEach((row, r) =>
         row.forEach((cell, c) => {

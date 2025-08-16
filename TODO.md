@@ -7,7 +7,8 @@
 
 ## bugfixes
 
-* Fix scrabble counting bug/check points
+* Fix/verify points calculation
+* Fix layout
 
 ## additional features
 
