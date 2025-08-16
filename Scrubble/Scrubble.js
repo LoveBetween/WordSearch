@@ -57,10 +57,11 @@ class Game{
 
         document.getElementById("page1").addEventListener("pointermove", (event) => { 
             this.onPointerMove(event)
-         })
-         document.getElementById("confirmPlay").addEventListener("click", (e) => {
-            this.confirmPlay()
-         })
+        })
+        document.getElementById("confirmPlay").addEventListener("click", (e) => {
+            this.confirmHumanPlay()
+        })
+
         this._ui = _ui
         this._gi = _gi
         this.highlightedCell = null
@@ -70,20 +71,10 @@ class Game{
         this.draggedLetterPlaced = false
         this.wordBeingPlaced = []
     }
+
+    //Grid
     initGrid(width, height){
         return Array(width).fill(null).map(() => Array(height).fill("_"))
-    }
-    getInput(posX, posY){
-        let x = Math.floor(posX/this._ui.cellSize)
-        let y = Math.floor(posY/this._ui.cellSize)
-        if(x < this._gi.width && y < this._gi.height){
-            let cell = [x,y]
-            if(this._gi.grid[x][y].length > 1 && this.letterHeld == null){
-                this.letterHeld = this._gi.grid[x][y][0]
-                this._gi.grid[x][y] = "_"
-            }
-            this.drawGrid()
-        }
     }
     highlightCell(x, y){
         this.highlightedCell = [x,y]
@@ -92,62 +83,9 @@ class Game{
         displayGrid(this._gi.grid, this._ui.multiGrid, this._ui.gridColors, this._ui.canvas, this._ui.cellSize, this.highlightedCell, valeurObj, true)
         drawLetterRack(this._ui.rackCanvas, this._ui.cellSize, this.letterRack, valeurObj, true)
     }
-    updateScore(player, score){
-        player.score += score
-        drawScore(this._ui.scoreText, this._gi.p1, this._gi.p2)
-    }
 
-    finishTurn(placement, word, player){
-        const score = calculatePlacementScore(placement, word, valeurObj, this._ui.multiGrid)
-        console.log("Chosen ", placement, word, score);
-
-        this.placeWord(placement, word)
-
-        const usedLetters = [...word].filter((ch, i) => placement.word[i] === "_").join('');
-        this.removeLetters(player, usedLetters)
-        this.updateScore(player, score)
-        updatePlayedWordsDisplay(this._ui.playedWords, word, score)
-        this.drawGrid()
-    }
-
-    playBotTurn(player, filter){
-        console.log(player)
-        const allCorrectPlacements = getAllCorrectPlacements(findAllPlacements(this._gi.grid), player.letters)
-
-        if (allCorrectPlacements.length === 0) {
-            console.log("No valid words found for current grid and letters.");
-            return false;
-        }
-
-        const best = filterWords(allCorrectPlacements, filter)
-        this.finishTurn(best.placement, best.word, player)
-        return true
-    }
-
-    drawLetters(player){
-        if (this._gi.letterBag.length == 0){
-            return false
-        }
-        for(let i = player.letters.length; i< 7 && this._gi.letterBag.length > 0; i++){
-            let rnd = Math.floor(Math.random() * this._gi.letterBag.length)
-            player.letters += this._gi.letterBag[rnd]
-            this._gi.letterBag = this._gi.letterBag.slice(0, rnd) + this._gi.letterBag.slice(rnd + 1)
-        }
-        return true
-    }
-    removeLetters(player, letters) {
-        const current = player.letters;
-        player.letters = [...letters].reduce((res, ch) => {
-            const i = res.indexOf(ch);
-            return i === -1 ? res : res.slice(0, i) + res.slice(i + 1);
-        }, current);
-    }
-
-    endGame() {
-        console.log("Game Ended: player 1 has " + this._gi.p1.score +
-                    " points and player 2 has " + this._gi.p2.score + " points.")
-    }
-
+    ////////////////// GAME 
+    
     newTurn(){
         this._gi.turn++
         let player = this._gi.turn % 2 == 1 ? this._gi.p1 : this._gi.p2;
@@ -167,55 +105,25 @@ class Game{
             this.drawLetters(player)
             this.letterRack = [...player.letters]
             this.drawGrid()
-            // Now wait for user to make a move and click confirmPlay
+            // Now wait for user to make a move and click confirmHumanPlay
         }
     }
     
-    placeWord(placement, word){
-        let placed = false
-        if (placement.direction == "horizontal"){
-            if(placement.x+word.length<16){
-                for(let i=0; i< word.length; i++){
-                    this._gi.grid[placement.x+i][placement.y] = word[i]
-                }
-                placed = true
-            }
-        } 
-        if (placement.direction == "vertical"){
-            if(placement.y+word.length<16){
-                for(let i=0; i< word.length; i++){
-                    this._gi.grid[placement.x][placement.y+i] = word[i]
-                }
-                placed = true
-            }
-        } 
-        return placed
-    }
-    clickLetterRack(posX){
-        let x = Math.floor(posX/this._ui.cellSize)
-        if (this.letterRack[x].length > 0){
-            this.letterHeld = this.letterRack[x]
-            this.letterRack[x] = null
-            drawLetterRack(this._ui.rackCanvas, this._ui.cellSize, this.letterRack, valeurObj, true)
+    playBotTurn(player, filter){
+        console.log(player)
+        const allCorrectPlacements = getAllCorrectPlacements(findAllPlacements(this._gi.grid), player.letters)
+
+        if (allCorrectPlacements.length === 0) {
+            console.log("No valid words found for current grid and letters.");
+            return false;
         }
+
+        const best = filterWords(allCorrectPlacements, filter)
+        this.finishTurn(best.placement, best.word, player)
+        return true
     }
 
-    calculateDragOnEmptyBoardSpace(e){
-        let canvas = this._ui.canvas
-        let rect = canvas.getBoundingClientRect();
-        var scale = canvas.getBoundingClientRect().width / canvas.offsetWidth;
-        let x = (e.clientX - rect.left)*scale;
-        let y = (e.clientY - rect.top)*scale;
-        let posX = Math.floor(x/this._ui.cellSize)
-        let posY = Math.floor(y/this._ui.cellSize)
-        if(posX > -1 && posX < this._gi.width &&
-        posY > -1 && posY < this._gi.height &&
-        this._gi.grid[posX][posY] == "_"){
-            return [true, posX, posY]
-        }
-        return [false]
-    }
-    confirmPlay(){
+    confirmHumanPlay(){
         let placement = findPlay(this._gi.grid, this._gi.width, this._gi.height)
         if(placement == null){
             console.log("your letters are not on one line!")
@@ -256,42 +164,146 @@ class Game{
         }
         
     }
+
+    finishTurn(placement, word, player){
+        const score = calculatePlacementScore(placement, word, valeurObj, this._ui.multiGrid)
+        console.log("Chosen ", placement, word, score);
+
+        this.placeWord(placement, word)
+
+        const usedLetters = [...word].filter((ch, i) => placement.word[i] === "_").join('');
+        this.removeLetters(player, usedLetters)
+        this.updateScore(player, score)
+        updatePlayedWordsDisplay(this._ui.playedWords, word, score)
+        this.drawGrid()
+    }
+
+    updateScore(player, score){
+        player.score += score
+        drawScore(this._ui.scoreText, this._gi.p1, this._gi.p2)
+    }
+
+    drawLetters(player){
+        if (this._gi.letterBag.length == 0){
+            return false
+        }
+        for(let i = player.letters.length; i< 7 && this._gi.letterBag.length > 0; i++){
+            let rnd = Math.floor(Math.random() * this._gi.letterBag.length)
+            player.letters += this._gi.letterBag[rnd]
+            this._gi.letterBag = this._gi.letterBag.slice(0, rnd) + this._gi.letterBag.slice(rnd + 1)
+        }
+        return true
+    }
     
+    removeLetters(player, letters) {
+        const current = player.letters;
+        player.letters = [...letters].reduce((res, ch) => {
+            const i = res.indexOf(ch);
+            return i === -1 ? res : res.slice(0, i) + res.slice(i + 1);
+        }, current);
+    }
+
+    endGame() {
+        console.log("Game Ended: player 1 has " + this._gi.p1.score +
+                    " points and player 2 has " + this._gi.p2.score + " points.")
+    }
+
+    
+    placeWord(placement, word){
+        let placed = false
+        if (placement.direction == "horizontal"){
+            if(placement.x+word.length<16){
+                for(let i=0; i< word.length; i++){
+                    this._gi.grid[placement.x+i][placement.y] = word[i]
+                }
+                placed = true
+            }
+        } 
+        if (placement.direction == "vertical"){
+            if(placement.y+word.length<16){
+                for(let i=0; i< word.length; i++){
+                    this._gi.grid[placement.x][placement.y+i] = word[i]
+                }
+                placed = true
+            }
+        } 
+        return placed
+    }
+
+    /////////////// INPUT HANDLING
 
     onPointerMove(e) {
-    if (this.letterHeld != null && mouseDown) {
-        const canvas = this._ui.canvas;
-        const draggedCanvas = this._ui.draggedCanvas;
-        const rect = canvas.getBoundingClientRect();
+        if (this.letterHeld != null && mouseDown) {
+            const canvas = this._ui.canvas;
+            const draggedCanvas = this._ui.draggedCanvas;
+            const rect = canvas.getBoundingClientRect();
 
-        const boardPos = this.calculateDragOnEmptyBoardSpace(e);
-        drawLetterRack(draggedCanvas, this._ui.cellSize, [this.letterHeld], valeurObj, true);
+            const boardPos = this.calculateDragOnEmptyBoardSpace(e);
+            drawLetterRack(draggedCanvas, this._ui.cellSize, [this.letterHeld], valeurObj, true);
 
-        draggedCanvas.style.position = 'absolute';
-        draggedCanvas.style.display = 'block';
+            draggedCanvas.style.position = 'absolute';
+            draggedCanvas.style.display = 'block';
 
-        if (boardPos[0]) {
-            draggedCanvas.style.left = `${rect.left + boardPos[1] * this._ui.cellSize}px`;
-            draggedCanvas.style.top = `${rect.top + boardPos[2] * this._ui.cellSize}px`;
-        } else {
-            draggedCanvas.style.left = `${e.clientX - this._ui.cellSize / 2}px`;
-            draggedCanvas.style.top = `${e.clientY - this._ui.cellSize / 2}px`;
+            if (boardPos[0]) {
+                draggedCanvas.style.left = `${rect.left + boardPos[1] * this._ui.cellSize + window.scrollX}px`;
+                draggedCanvas.style.top = `${rect.top + boardPos[2] * this._ui.cellSize + window.scrollY}px`;
+            } else {
+                draggedCanvas.style.left = `${e.clientX - this._ui.cellSize / 2}px`;
+                draggedCanvas.style.top = `${e.clientY - this._ui.cellSize / 2}px`;
+            }
+        } else if (this.letterHeld != null) {
+            const boardPos = this.calculateDragOnEmptyBoardSpace(e);
+            if (boardPos[0]) {
+                this._gi.grid[boardPos[1]][boardPos[2]] = this.letterHeld + "°";
+                this.drawGrid();
+            } else {
+                this.letterRack[this.letterRack.findIndex(e => e == null)] = this.letterHeld;
+                this.drawGrid();
+            }
+
+            this.letterHeld = null;
+            this._ui.draggedCanvas.style.display = "none";
         }
-    } else if (this.letterHeld != null) {
-        const boardPos = this.calculateDragOnEmptyBoardSpace(e);
-        if (boardPos[0]) {
-            this._gi.grid[boardPos[1]][boardPos[2]] = this.letterHeld + "°";
-            this.drawGrid();
-        } else {
-            this.letterRack[this.letterRack.findIndex(e => e == null)] = this.letterHeld;
-            this.drawGrid();
-        }
-
-        this.letterHeld = null;
-        this._ui.draggedCanvas.style.display = "none";
     }
-}
-     
+
+    calculateDragOnEmptyBoardSpace(e){
+        let canvas = this._ui.canvas
+        let rect = canvas.getBoundingClientRect();
+        let scaleX = rect.width / canvas.offsetWidth;
+        let scaleY = rect.height / canvas.offsetHeight;
+        let x = (e.clientX - rect.left)*scaleX;
+        let y = (e.clientY - rect.top)*scaleY;
+        let posX = Math.floor(x/this._ui.cellSize)
+        let posY = Math.floor(y/this._ui.cellSize)
+        if(posX > -1 && posX < this._gi.width &&
+        posY > -1 && posY < this._gi.height &&
+        this._gi.grid[posX][posY] == "_"){
+            return [true, posX, posY]
+        }
+        return [false]
+    }
+
+    clickLetterRack(posX){
+        let x = Math.floor(posX/this._ui.cellSize)
+        if (this.letterRack[x].length > 0){
+            this.letterHeld = this.letterRack[x]
+            this.letterRack[x] = null
+            drawLetterRack(this._ui.rackCanvas, this._ui.cellSize, this.letterRack, valeurObj, true)
+        }
+    }
+
+    getInput(posX, posY){
+        let x = Math.floor(posX/this._ui.cellSize)
+        let y = Math.floor(posY/this._ui.cellSize)
+        if(x < this._gi.width && y < this._gi.height){
+            let cell = [x,y]
+            if(this._gi.grid[x][y].length > 1 && this.letterHeld == null){
+                this.letterHeld = this._gi.grid[x][y][0]
+                this._gi.grid[x][y] = "_"
+            }
+            this.drawGrid()
+        }
+    }
 }
 
 function inputHandler(canvas, e, controller){
