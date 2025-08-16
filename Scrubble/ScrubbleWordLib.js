@@ -94,27 +94,22 @@ function findPlay(grid, width, height) {
         })
     );
     let placedNb = 1
-    let xDir = 0
-    let yDir = 0
+    let dir = 0
     let x = placedL[0][0]
     let y = placedL[0][1]
     if (placedL.length == 1){
-        if(x>0 && grid[x-1][y] != "_"){
-            xDir = 1
-        }
-        else{
-            yDir = 1
+        if((x>0 && grid[x-1][y]) != "_" || x<width && grid[x+1][y] != "_"){
+            dir = 1
         }
     }
     else{
         let xEnd = placedL[placedL.length - 1][0]
         let yEnd = placedL[placedL.length - 1][1]
-        xDir = (xEnd-x) >= (yEnd-y) ? 1 : 0;
-        yDir = (xEnd-x) < (yEnd-y) ? 1 : 0;
+        dir = (xEnd-x) >= (yEnd-y) ? 1 : 0;
         while(x<width && y<height && placedNb < placedL.length &&
-            ((xDir > 0 && x<xEnd) || (yDir > 0 && y<yEnd))){
-            x += xDir
-            y += yDir
+            ((dir > 0 && x<xEnd) || (dir < 1 && y<yEnd))){
+            x += dir
+            y += 1-dir
             if(grid[x][y] == "_"){
                 return null
             }
@@ -127,23 +122,25 @@ function findPlay(grid, width, height) {
         let x = placedL[0][0]
         let y = placedL[0][1]
         while(x>0 && y>0 && grid[x][y] != "_"){
-            x -= xDir
-            y -= yDir
+            x -= dir
+            y -= 1-dir
         }
         if(grid[x][y] == "_"){
-            x += xDir
-            y += yDir
+            x += dir
+            y += 1-dir
         }
         let cleanedGrid = grid.map(row =>
             row.map(value => value.length>1 ? "_" : value)
         );
         let transposedGrid = cleanedGrid[0].map((_, colIndex) => cleanedGrid.map(row => row[colIndex]));
-        if (xDir < yDir){
+        if (dir < 1){
             return  findPlacementVertical(cleanedGrid, x, y, "vertical")
         }else{
             let placement = findPlacementVertical(transposedGrid, y, x, "horizontal");
-            placement.x = x
-            placement.y = y
+            if(placement != null){
+                placement.x = x
+                placement.y = y
+            }
             return placement
         }
     }
