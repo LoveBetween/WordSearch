@@ -51,8 +51,8 @@ function findPlacementVertical(grid, x, y, dir){
         return null
     }
     placement.nextLetter = "_"
-    if(y+spaceNb+letterNb+1<15){
-        placement.nextLetter = grid[x][y+spaceNb+letterNb+1]
+    if (y + spaceNb + letterNb < 15) {
+        placement.nextLetter = grid[x][y + spaceNb + letterNb];
     }
     placement.word = mainWord
     placement.perpendicular = perpendicularWords

@@ -202,8 +202,37 @@ class Game{
         return [false]
     }
     confirmPlay(){
-        console.log(findPlay(this._gi.grid, this._gi.width, this._gi.height))
+        let placement = findPlay(this._gi.grid, this._gi.width, this._gi.height)
+        if(placement == null){
+            console.log("your letters are not on one line!")
+        }
+        else{
+            let word = ""
+            let d = placement.direction == "horizontal" ? 1 : 0;
+            let x = placement.x
+            let y = placement.y
+            let letters = ""
+            while(x<this._gi.width && y<this._gi.height && this._gi.grid[x][y] != "_"){ // write word and ciment placed letters at once
+                if(this._gi.grid[x][y].length > 1 && this._gi.grid[x][y][1] == "°"){
+                    letters += this._gi.grid[x][y][0]
+                }
+                word += this._gi.grid[x][y][0]
+                x+= d
+                y+= 1-d
+            }
+            console.log(placement, letters)
+            if(dawg.checkPlacement(placement, letters).has(word)){
+                const score = calculatePlacementScore(placement, word, valeurObj, this._ui.multiGrid)
+                console.log(word + " is a correct play worth "+ score +" points!")
+
+            }
+            else{
+                console.log("this is not a correct play")
+            }
+            
+        }
     }
+    
 
     onPointerMove(e){
         if (this.letterHeld != null && mouseDown){
