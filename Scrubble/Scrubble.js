@@ -58,6 +58,9 @@ class Game{
         document.getElementById("page1").addEventListener("pointermove", (event) => { 
             this.onPointerMove(event)
          })
+         document.getElementById("confirmPlay").addEventListener("click", (e) => {
+            this.confirmPlay()
+         })
         this._ui = _ui
         this._gi = _gi
         this.highlightedCell = null
@@ -198,6 +201,9 @@ class Game{
         }
         return [false]
     }
+    confirmPlay(){
+        console.log(findPlay(this._gi.grid, this._gi.width, this._gi.height))
+    }
 
     onPointerMove(e){
         if (this.letterHeld != null && mouseDown){
@@ -232,6 +238,7 @@ class Game{
             this._ui.draggedCanvas.style.display = "none"
         }
     }
+     
 }
 
 function inputHandler(canvas, e, controller){

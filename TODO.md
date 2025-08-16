@@ -1,13 +1,16 @@
 # Scrubble
 
 * Setup correct css
-* Input system
-* Score
 * Menu/Reset
-* Add info struct to contain all misc game info
 * Game summary
-* Add color coding to word history
+* Add passing/exchanging letters
 
 ## bugfixes
 
 * Fix scrabble counting bug/check points
+
+## additional features
+
+* Cookie saving/loading
+* Switching letters in rack
+* Add color coding to word history

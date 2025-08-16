@@ -79,6 +79,75 @@ function findAllPlacements(grid){
     return allPlacements
 }
 
+function findPlay(grid, width, height) {
+    function isPlaced(cell) {
+        return typeof cell === "string" && cell.length === 2 && cell[1] === "°";
+    }
+    var placedL = []
+    grid.forEach((row, r) =>
+        row.forEach((cell, c) => {
+            if (isPlaced(cell)) {
+                placedL.push([r, c]);
+            }
+        })
+    );
+    let placedNb = 1
+    let xDir = 0
+    let yDir = 0
+    let x = placedL[0][0]
+    let y = placedL[0][1]
+    if (placedL.length == 1){
+        if(x>0 && grid[x-1][y] != "_"){
+            xDir = 1
+        }
+        else{
+            yDir = 1
+        }
+    }
+    else{
+        let xEnd = placedL[placedL.length - 1][0]
+        let yEnd = placedL[placedL.length - 1][1]
+        xDir = (xEnd-x) >= (yEnd-y) ? 1 : 0;
+        yDir = (xEnd-x) < (yEnd-y) ? 1 : 0;
+        while(x<width && y<height && placedNb < placedL.length &&
+            ((xDir > 0 && x<xEnd) || (yDir > 0 && y<yEnd))){
+            x += xDir
+            y += yDir
+            if(grid[x][y] == "_"){
+                return null
+            }
+            else if(isPlaced(grid[x][y])){
+                placedNb++
+            }
+        }
+    }
+    if (placedNb == placedL.length){ //gg all letters
+        let x = placedL[0][0]
+        let y = placedL[0][1]
+        while(x>0 && y>0 && grid[x][y] != "_"){
+            x -= xDir
+            y -= yDir
+        }
+        if(grid[x][y] == "_"){
+            x += xDir
+            y += yDir
+        }
+        let cleanedGrid = grid.map(row =>
+            row.map(value => value.length>1 ? "_" : value)
+        );
+        let transposedGrid = cleanedGrid[0].map((_, colIndex) => cleanedGrid.map(row => row[colIndex]));
+        if (xDir < yDir){
+            return  findPlacementVertical(cleanedGrid, x, y, "vertical")
+        }else{
+            let placement = findPlacementVertical(transposedGrid, y, x, "horizontal");
+            placement.x = x
+            placement.y = y
+            return placement
+        }
+    }
+    return null
+}
+
 // Adding new function to dawg class
 Dawg.prototype.checkValidWord = function(word){
     let node = this.root;
@@ -94,7 +163,8 @@ Dawg.prototype.checkValidWord = function(word){
     return false
 }
 
-Dawg.prototype.checkPlacementRec = function(placement, node, letters, newWord, words, isConnected, letterPlaced){
+Dawg.prototype.checkPlacement = function(placement, letters){
+    Dawg.prototype.checkPlacementRec = function(placement, node, letters, newWord, words, isConnected, letterPlaced){
     if( node.final && isConnected && letterPlaced &&
         (placement.word.length<=newWord.length && placement.nextLetter == "_" 
             || placement.word[newWord.length] == "_")){ // the word shouldn't end with a letter right after it
@@ -129,8 +199,6 @@ Dawg.prototype.checkPlacementRec = function(placement, node, letters, newWord, w
     }
     return words
 }
-
-Dawg.prototype.checkPlacement = function(placement, letters){
     let words = new Set()
     return(this.checkPlacementRec(placement, this.root, letters, "", words, false, false))
 }
