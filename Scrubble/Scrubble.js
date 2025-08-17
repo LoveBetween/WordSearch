@@ -37,7 +37,7 @@ var GameInfo = {
     width : 15,
     height : 15,
     grid : initGrid(15, 15),
-    p1 : {name:"p1", type:"player", letters:"", score:0},
+    p1 : {name:"p1", type:"computer", letters:"", score:0},
     p2 : {name:"p2", type:"computer", letters:"", score:0},
     highlightCell : null,
     letterBag : sacDeLettres,
@@ -79,7 +79,7 @@ class Game{
     highlightCell(x, y){
         this.highlightedCell = [x,y]
     }
-    drawGrid(){
+    refreshDisplay(){
         displayGrid(this._gi.grid, this._ui.multiGrid, this._ui.gridColors, this._ui.canvas, this._ui.cellSize, this.highlightedCell, valeurObj, true)
         drawLetterRack(this._ui.rackCanvas, this._ui.cellSize, this.letterRack, valeurObj, true)
     }
@@ -92,7 +92,7 @@ class Game{
         let isStuck = false
 
         if (player.type == "computer") {
-            if (!this.playBotTurn(player, Filters.MOSTPOINTS)) {
+            if (!this.playBotTurn(player, Filters.MOST_CONNECTIONS)) {
                 isStuck = true
             }
 
@@ -104,8 +104,7 @@ class Game{
         } else {
             this.drawLetters(player)
             this.letterRack = [...player.letters]
-            this.drawGrid()
-            // Now wait for user to make a move and click confirmHumanPlay
+            this.refreshDisplay()
         }
     }
     
@@ -174,8 +173,14 @@ class Game{
         const usedLetters = [...word].filter((ch, i) => placement.word[i] === "_").join('');
         this.removeLetters(player, usedLetters)
         this.updateScore(player, score)
-        updatePlayedWordsDisplay(this._ui.playedWords, word, score)
-        this.drawGrid()
+        let perpendicularWords = placement.perpendicular.map(
+            (pWord, i) => pWord.replace("_", word[i])
+        )
+        .filter(
+            (pWord, i) => i< word.length && pWord.length > 1
+        )
+        updatePlayedWordsDisplay(this._ui.playedWords, word, perpendicularWords, score)
+        this.refreshDisplay()
     }
 
     updateScore(player, score){
@@ -255,10 +260,10 @@ class Game{
             const boardPos = this.calculateDragOnEmptyBoardSpace(e);
             if (boardPos[0]) {
                 this._gi.grid[boardPos[1]][boardPos[2]] = this.letterHeld + "°";
-                this.drawGrid();
+                this.refreshDisplay();
             } else {
                 this.letterRack[this.letterRack.findIndex(e => e == null)] = this.letterHeld;
-                this.drawGrid();
+                this.refreshDisplay();
             }
 
             this.letterHeld = null;
@@ -288,7 +293,7 @@ class Game{
         if (this.letterRack[x].length > 0){
             this.letterHeld = this.letterRack[x]
             this.letterRack[x] = null
-            drawLetterRack(this._ui.rackCanvas, this._ui.cellSize, this.letterRack, valeurObj, true)
+            this.refreshDisplay()
         }
     }
 
@@ -301,7 +306,7 @@ class Game{
                 this.letterHeld = this._gi.grid[x][y][0]
                 this._gi.grid[x][y] = "_"
             }
-            this.drawGrid()
+            this.refreshDisplay()
         }
     }
 }
@@ -324,10 +329,6 @@ function initGrid(width, height){
 }
 
 function init(){
-    var grid = initGrid(15, 15)
-    var dawg = new Dawg()
-    dawg.setup(FRENCH_DICTIONNARY)
-
     var game = new Game(GameInfo, UIElements);
     game.letterRack = ["","","","","","",""]
 

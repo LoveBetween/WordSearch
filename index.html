@@ -24,7 +24,7 @@
             </div>
             <div class="Scrubble">
                 <canvas id="letterRack" width="350" height="50"></canvas>
-                <button id="confirmPlay" class="button-21"> Confirmer mot</button>
+                <button id="confirmPlay" class="button-21"> Jouer mot</button>
             </div>
             <canvas id="dragged"></canvas>
         </div>
@@ -57,6 +57,10 @@
     <script src="Lib/englishDictionary.js"></script>
     <script src="Lib/frenchDictionary.js"></script>
     <script src="Lib/Dawg.js"></script>
+    <script>
+        var dawg = new Dawg()
+        dawg.setup(FRENCH_DICTIONNARY)
+    </script>
 
     <!-- Page 1 specific -->
     <script src="Scrubble/ScrubbleWordLib.js"></script>

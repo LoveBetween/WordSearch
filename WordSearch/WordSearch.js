@@ -22,10 +22,10 @@ window.onclick = function(event) {
 
 //https://stackoverflow.com/questions/724857/how-to-find-javascript-variable-by-its-name use this or arrays
 
-var frenchDawg = new Dawg()
-frenchDawg.setup(FRENCH_DICTIONNARY)
-var englishDawg = new Dawg()
-var dawg = frenchDawg
+// var frenchDawg = new Dawg()
+// frenchDawg.setup(FRENCH_DICTIONNARY)
+// var englishDawg = new Dawg()
+// var dawg = frenchDawg
 
 function changeLanguage(lang){
     switch(lang){

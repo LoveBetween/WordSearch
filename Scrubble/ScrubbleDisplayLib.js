@@ -48,9 +48,16 @@ function displayGrid(grid, multiGrid, multiColors, canvas, cellSize, highlighted
     ctx.save()
 }
 
-function updatePlayedWordsDisplay(playedWords, chosenWord, score){
+function updatePlayedWordsDisplay(playedWords, chosenWord, perpendicularWords, score){
     playedWords.setAttribute('style', 'white-space: pre');
-    playedWords.innerHTML = playedWords.innerHTML + chosenWord.length + " - " + createFrenchSpanLink(chosenWord) +"  "+ score +" Points \n"
+    let newString = chosenWord.length + " - " + createFrenchSpanLink(chosenWord)
+    perpendicularWords.forEach(word =>{
+        console.log(word)
+        newString += " " + createFrenchSpanLink(word);     
+        }
+    )
+
+    playedWords.innerHTML = playedWords.innerHTML + newString +"  "+ score +" Points \n"
 }
 
 function letterDragOverlay(ctx, cellSize, char, posX, posY, lettersValue, drawValue){

@@ -313,7 +313,7 @@ function calculatePlacementScore(placement, word, letterPoints, multiGrid){
         }
         
     }
-    totalScore = wordScore * multiplier
+    totalScore += wordScore * multiplier
     totalScore = lettersUsed >= 7 ? totalScore + 50: totalScore;
     return totalScore
 }
@@ -329,12 +329,18 @@ function getAllCorrectPlacements(placements, letters){
     )
 }
 
+function connectionsNb(w){
+    return w.placement.perpendicular.filter(
+        (pWord, i) => i< w.word.length && pWord.length > 1
+    ).length
+}
+
 const Filters = {
     LONGEST: (a, b) => a.word.length > b.word.length ? a : b,
-    MOSTPOINTS : (a,b) => calculatePlacementScore(a.placement, a.word, valeurObj, standardMultiGrid) > 
-    calculatePlacementScore(b.placement, b.word, valeurObj, standardMultiGrid) ? a : b,
+    MOST_POINTS : (a,b) => calculatePlacementScore(a.placement, a.word, valeurObj, standardMultiGrid) > 
+                        calculatePlacementScore(b.placement, b.word, valeurObj, standardMultiGrid) ? a : b,
     SHORTEST: (a,b) => a.word.length < b.word.length ? a : b,
-
+    MOST_CONNECTIONS: (a,b) => connectionsNb(a) > connectionsNb(b) ? a : b
 }
 
 function filterWords(placements, filter){
